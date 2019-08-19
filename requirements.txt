@@ -1,0 +1,11 @@
+
+Flask
+numpy
+pandas
+scikit-learn
+pylint
+matplotlib
+pillow
+beautifulsoup4
+jupyter
+jupyterlab
