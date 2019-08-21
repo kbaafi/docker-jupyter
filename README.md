@@ -253,7 +253,7 @@ Github+Docker is a match made in heaven that produces wonderful baby deployments
 
 ![dhub](images/docker-git-2.png)
 
-This automatically begins to build a new docker image for you, with any commit to your Docker repository. Awesome right? 
+This automatically begins to build a new docker image for you, with any commit to your Docker repository. Awesome right?
 
 ![dhub](images/auto-build-dhub.png)
 
