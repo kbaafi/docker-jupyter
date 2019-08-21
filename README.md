@@ -13,14 +13,17 @@ Docker is a tool that is designed to benefit both developers and system administ
 ### On Debian Linux
 
 * Uninstall old versions
+
     ```$ sudo apt-get remove docker-engine docker.io```
 
 * Install Docker CE
-    ``` $ sudo apt-get update```
+
+    ```$ sudo apt-get update```
+
     ```$ sudo apt-get install docker-ce```
-    
+
 ### On Mac
-    
+
 * Download and run this [package file](https://download.docker.com/mac/stable/Docker.dmg)  
 
 ### On Windows
@@ -29,10 +32,10 @@ The most important fact you need to know is : The current version of Docker for 
 
 If you are running Windows 10 Home, your easiest bet is to run docker in a linux VM, but you can look [here](https://medium.com/@mbyfieldcameron/docker-on-windows-10-home-edition-c186c538dff3)
 
-
 ## Your first container
 
-Let's run a hello-world docker image. Its as simple as 
+Let's run a hello-world docker image. Its as simple as
+
 ```sudo docker run hello-world```
 
 **But what does it do?**
@@ -44,35 +47,36 @@ If you dont have a docker repository called **hello-world**, docker will attempt
 See below the output from running the command
 
 > kbaafi@kbaafi-pc:~/Desktop/integrify$ sudo docker run hello-world
-    Unable to find image 'hello-world:latest' locally
-    latest: Pulling from library/hello-world
-    1b930d010525: Pull complete 
-    Digest: sha256:6540fc08ee6e6b7b63468dc3317e3303aae178cb8a45ed3123180328bcc1d20f
-    Status: Downloaded newer image for hello-world:latest
+>    Unable to find image 'hello-world:latest' locally
+>    latest: Pulling from library/hello-world
+>    1b930d010525: Pull complete 
+>    Digest: sha256:6540fc08ee6e6b7b63468dc3317e3303aae178cb8a45ed3123180328bcc1d20f
+>    Status: Downloaded newer image for hello-world:latest
 > 
 > Hello from Docker!
-    This message shows that your installation appears to be working correctly.
+>    This message shows that your installation appears to be working correctly.
 
 ## OK now back to Machine Learning how can this Docker thingy help you
 
 Using docker we hope to isolate the dependencies of our machine learning algorithms from a specific host machine such that any other machine, as long as it supports docker can run our algorithms without any dependency issues. Our container should have all that it needs to run the machine learning application or pipeline. We want to be able to install dependencies like pandas, matplotlib, seaborn and others without affecting our host python environment.
 
-### How Docker works
+## How Docker works
 
-**Images**
+### Images
+
 Images are the basic building blocks of Docker. Containers are built from images and they are self contained virtual environments that run isolated on the host machine, and deliver the application without significant change to the host machine's inner workings.  Images can be configured with applications and used as a template for creating containers. It is organized in a layered fashion. Every change in an image is added as a layer on top of it. Most docker images are derived a base image. An example will be having a base ubuntu image, installing python on it to create a new image and then installing say, pandas on it to create an even newer image.
 
 ![docker-image](images/docker-architecture-techtip39.png)
 
-**Docker/Container registry**
+### Docker/Container registry
 
 A container registry a repository for Docker images. Using Docker registry, you can build and share images with your team. A registry can be public or private. Docker Inc provides a hosted registry service called Docker Hub. It allows you to upload and download images from a central location. 
 
-**Containers**
+### Containers
 
 The container is the execution environment for Docker. Containers are created from images. It is a writable layer of the image. You can package your applications in a container, commit it and make it a golden image to build more containers from it. Two or more containers can be linked together to form tiered application architecture. Containers can be started, stopped, committed and terminated. If you terminate a container without committing it, all the changes made to the container will be lost.
 
-# Docker for Data Science: working with a base image.
+## Docker for Data Science: working with a base image
 
 In this tutorial, we aim to build a docker image from a base image that has python 3.7 on a Debian platform.
 
@@ -93,17 +97,19 @@ This produces the following output
 >hello-world         latest              fce289e99eb9        7 months ago        1.84kB
 ></pre>
 
-Now that we have a base python image we can do 2 things: 
-* login to the container and install the dependencies or 
+Now that we have a base python image we can do 2 things:
+
+* login to the container and install the dependencies or
+
 * build a new image using a configuration file called a Dockerfile
 
-#### Running the image and installing the dependencies ourselves
+### Running the image and installing the dependencies ourselves
 
 To run the container revealing the bash command line,execute the following
 
 ```$ sudo docker run -it python:3.7.3-stretch /bin/bash```
 
-Now we can run ```python --version```  in the docker cli to reveal the python version 
+Now we can run ```python --version```  in the docker cli to reveal the python version of the container
 
 > root@8d9edb544fbb:/# python --version
 >Python 3.7.3
@@ -118,26 +124,23 @@ Let's examine the output
 >8d9edb544fbb        python:3.7.3-stretch   &quot;/bin/bash&quot;         2 minutes ago       Up 2 minutes                            mystifying_brown
 ></pre>
 
-**Installing dependencies**
+#### Installing dependencies
+
 Let's go ahead and install the dependencies by running the following in your container terminal
 
-```pip install --upgrade pip```
+```console
+    $ pip install --upgrade pip
+    $ pip install numpy
+    $ pip install pandas
+    $ pip install scikit-learn
+    $ pip install matplotlib
+    $ pip install seaborn
+    $ pip install jupyterlab
+```
 
-```pip install numpy```
+Now that we have a good base environment we can save it to our local docker repository and push it to dockerhub (if we have an account...which we should)
 
-```pip install pandas```
-
-```pip install scikit-learn```
-
-```pip install matplotlib```
-
-```pip install seaborn```
-
-```pip install jupyterlab```
-
-Now that we have a good base environment we can save it to our local docker repository and push it to docker hub (if we have an account...which we should)
-
-We use this command ```$ sudo docker commit [container-id] [new_repository:[new_tag]] [-m "message"]```
+We use this command `$ sudo docker commit [container-id] [new_repository:[new_tag]] [-m "message"]`
 
 So we can run
 
@@ -159,16 +162,15 @@ Ok, so now we have our docker image. And its time for me to go to work. I'll pus
 
 Lets run docker push to do this:
 
-```$ sudo docker login --username=kbaafi``` to login to docker hub
+* `$ sudo docker login --username=kbaafi` to login to docker hub
 
-```$ sudo docker tag 0e5679ebf079 kbaafi/dockerml:latest``` to tag the image on dockerhub
+* ```$ sudo docker tag 0e5679ebf079 kbaafi/dockerml:latest``` to tag the image on dockerhub
 
-```$ sudo docker push kbaafi/dockerml``` to push the image to docker hub
+* ```$ sudo docker push kbaafi/dockerml``` to push the image to docker hub
 
 We can verify it below:
 
 ![docker-hub](images/dhub.png)
-
 
 ## Aaand we're back: Pulling your image back from dockerhub
 
@@ -226,7 +228,19 @@ In our case we can run
 
 And we can run ```$ sudo docker image ls``` to confirm and we can now tag and push to DockerHub
 
-## An even fancier way: Automating your Docker builds by integrating DockerHub with Github
+**OK, so what is a docker repository?** A Docker image can be compared to a git repo. A git repo can be hosted inside of a GitHub repository, but it could also be hosted on Gitlab, BitBucket or your own git repo hosting service. It could also sit on your development box and not be hosted anywhere.
+
+The same goes for a Docker image. You can choose to not push it anywhere, but you could also push it to the Docker Hub which is both a public and private service for hosting Docker repositories. There are other third party repository hosting services too.
+
+The thing to remember here is a Docker repository is a place for you to publish and access your Docker images. Just like GitHub is a place for you to publish and access your git repos.
+
+It’s also worth pointing out that the Docker Hub and other third party repository hosting services are called “registries”. A registry stores a collection of repositories.
+
+You could say a registry has many repositories and a repository has many different versions of the same image which are individually versioned with tags.
+
+[Reference for explanation on docker registries and repositories](https://nickjanetakis.com/blog/docker-tip-53-difference-between-a-registry-repository-and-image)
+
+## An even better way: Automating your Docker builds by integrating DockerHub with Github
 
 Github+Docker is a match made in heaven that produces wonderful baby deployments. Lets see how this is done.
 
@@ -264,7 +278,7 @@ When running the image you can use the following setting
 
 ```-p <host_port>:<container_port>``` to connect between the host and the container
 
-Volume sharing between host and container: Volumes allow the container to write to files on the host and this is where **jupyter+docker** shines when used for machine learning projects. Volumes allow you to connect the working directory on the host to a directory in the container.
+Volumes allow the container to persist data on the host and this is where **jupyter+docker** shines when used for machine learning projects. Volumes allow you to connect the working directory on the host to a directory in the container.
 
 You can use the option
 
